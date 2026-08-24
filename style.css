@@ -14,10 +14,6 @@
 }
 
 
-/* =========================================================
-   RESET
-========================================================= */
-
 * {
   box-sizing: border-box;
 }
@@ -65,10 +61,6 @@ input {
 }
 
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
-
 .dashboard {
   width: min(1600px, calc(100% - 40px));
   height: 100vh;
@@ -90,10 +82,6 @@ input {
 }
 
 
-/* =========================================================
-   SIDEBAR
-========================================================= */
-
 .sidebar {
   min-height: 0;
 
@@ -106,10 +94,6 @@ input {
   gap: var(--gap);
 }
 
-
-/* =========================================================
-   MAIN CONTENT
-========================================================= */
 
 .content {
   min-width: 0;
@@ -125,10 +109,6 @@ input {
 }
 
 
-/* =========================================================
-   PANELS
-========================================================= */
-
 .panel,
 .search-bar {
   border: 1px solid var(--border);
@@ -140,7 +120,7 @@ input {
       rgba(255, 255, 255, 0.015),
       transparent
     ),
-    rgba(35, 42, 46, 0.76);
+    var(--surface);
 
   backdrop-filter: blur(6px);
 }
@@ -169,10 +149,6 @@ input {
   padding: 16px 20px;
 }
 
-
-/* =========================================================
-   GREETING
-========================================================= */
 
 .greeting-panel {
   display: flex;
@@ -246,16 +222,12 @@ input {
 }
 
 
-/* =========================================================
-   LINK LISTS
-========================================================= */
-
 .link-list {
   margin-top: 18px;
 
   display: grid;
 
-  gap: 16px;
+  gap: 12px;
 }
 
 
@@ -269,7 +241,7 @@ input {
 
   color: var(--secondary);
 
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 
   text-decoration: none;
 
@@ -285,10 +257,6 @@ input {
   transform: translateX(4px);
 }
 
-
-/* =========================================================
-   ICONS
-========================================================= */
 
 .icon {
   width: 22px;
@@ -329,10 +297,6 @@ input {
   stroke: none;
 }
 
-
-/* =========================================================
-   SEARCH
-========================================================= */
 
 .search-bar {
   padding: 0 20px;
@@ -389,10 +353,6 @@ input {
 }
 
 
-/* =========================================================
-   PINTEREST PANEL
-========================================================= */
-
 .pinterest-panel {
   min-width: 0;
   min-height: 0;
@@ -415,10 +375,6 @@ input {
 }
 
 
-/* =========================================================
-   PINTEREST MASONRY GRID
-========================================================= */
-
 .pin-grid {
   min-width: 0;
   min-height: 0;
@@ -428,8 +384,16 @@ input {
   overflow-y: auto;
   overflow-x: hidden;
 
-  column-count: 4;
-  column-gap: 10px;
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  grid-auto-rows: 8px;
+
+  gap: 10px;
+
+  align-content: start;
 
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
@@ -456,10 +420,6 @@ input {
 .pin {
   display: block;
 
-  margin-bottom: 10px;
-
-  break-inside: avoid;
-
   overflow: hidden;
 
   border-radius: 8px;
@@ -467,13 +427,33 @@ input {
   background: var(--surface-soft);
 
   text-decoration: none;
+
+  grid-row-end: span 28;
+}
+
+
+.pin:nth-child(3n + 1) {
+  grid-row-end: span 44;
+}
+
+
+.pin:nth-child(4n + 2) {
+  grid-row-end: span 30;
+}
+
+
+.pin:nth-child(5n + 3) {
+  grid-row-end: span 36;
 }
 
 
 .pin img {
   width: 100%;
+  height: 100%;
 
   display: block;
+
+  object-fit: cover;
 
   filter:
     saturate(0.85)
@@ -493,10 +473,6 @@ input {
     brightness(1);
 }
 
-
-/* =========================================================
-   THEME SELECTOR
-========================================================= */
 
 .theme-panel {
   grid-column: 1 / -1;
@@ -546,12 +522,13 @@ input {
 }
 
 
-/* =========================================================
-   THEME BUTTON COLOURS
-========================================================= */
-
 .theme-button[data-theme="everforest"] {
   background: #a7c080;
+}
+
+
+.theme-button[data-theme="komorebi"] {
+  background: #d08770;
 }
 
 
@@ -565,14 +542,19 @@ input {
 }
 
 
-.theme-button[data-theme="warm"] {
-  background: #e69875;
+body[data-theme="komorebi"] {
+  --background: #181818;
+  --surface: #202020;
+  --surface-soft: #282828;
+  --border: #3a3a3a;
+
+  --text: #d8d8d8;
+  --muted: #888888;
+
+  --accent: #d08770;
+  --secondary: #e0c080;
 }
 
-
-/* =========================================================
-   CATPPUCCIN
-========================================================= */
 
 body[data-theme="catppuccin"] {
   --background: #11111b;
@@ -582,14 +564,11 @@ body[data-theme="catppuccin"] {
 
   --text: #cdd6f4;
   --muted: #7f849c;
+
   --accent: #a6e3a1;
   --secondary: #f9e2af;
 }
 
-
-/* =========================================================
-   BLUE
-========================================================= */
 
 body[data-theme="blue"] {
   --background: #16161e;
@@ -599,31 +578,11 @@ body[data-theme="blue"] {
 
   --text: #c0caf5;
   --muted: #565f89;
+
   --accent: #7aa2f7;
   --secondary: #e0af68;
 }
 
-
-/* =========================================================
-   WARM
-========================================================= */
-
-body[data-theme="warm"] {
-  --background: #181616;
-  --surface: #221f1f;
-  --surface-soft: #2b2626;
-  --border: #443b3b;
-
-  --text: #e6d7c3;
-  --muted: #9c8a7a;
-  --accent: #d3a46f;
-  --secondary: #e69875;
-}
-
-
-/* =========================================================
-   TABLET
-========================================================= */
 
 @media (max-width: 1100px) {
 
@@ -671,15 +630,12 @@ body[data-theme="warm"] {
 
 
   .pin-grid {
-    column-count: 3;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
   }
 
 }
 
-
-/* =========================================================
-   MOBILE
-========================================================= */
 
 @media (max-width: 700px) {
 
@@ -701,7 +657,8 @@ body[data-theme="warm"] {
 
 
   .pin-grid {
-    column-count: 2;
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
 
