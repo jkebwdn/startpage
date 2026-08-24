@@ -34,7 +34,11 @@ body {
   background:
     radial-gradient(
       circle at top,
-      color-mix(in srgb, var(--accent) 4%, transparent),
+      color-mix(
+        in srgb,
+        var(--accent) 4%,
+        transparent
+      ),
       transparent 42%
     ),
     var(--background);
@@ -66,7 +70,11 @@ input {
 ========================================================= */
 
 .dashboard {
-  width: min(1600px, calc(100% - 40px));
+  width: min(
+    1600px,
+    calc(100% - 40px)
+  );
+
   height: 100vh;
 
   margin: 0 auto;
@@ -321,6 +329,7 @@ input {
 
 .icon-fill svg {
   fill: currentColor;
+
   stroke: none;
 }
 
@@ -385,7 +394,7 @@ input {
 
 
 /* =========================================================
-   PINTEREST
+   PINTEREST PANEL
 ========================================================= */
 
 .pinterest-panel {
@@ -406,106 +415,70 @@ input {
   display: flex;
   align-items: center;
 
-  border-bottom: 1px solid var(--border);
+  border-bottom:
+    1px solid var(--border);
 }
 
 
-.pin-grid {
+/* =========================================================
+   PINTEREST OFFICIAL PROFILE WIDGET
+========================================================= */
+
+.pinterest-widget-scroll {
   min-width: 0;
   min-height: 0;
 
-  padding: 12px;
+  width: 100%;
+  height: 100%;
 
   overflow-y: auto;
   overflow-x: hidden;
 
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  grid-auto-rows: 8px;
-
-  gap: 10px;
-
-  align-content: start;
+  padding: 12px;
 
   scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-color:
+    var(--border)
+    transparent;
 }
 
 
-.pin-grid::-webkit-scrollbar {
+.pinterest-widget-scroll::-webkit-scrollbar {
   width: 6px;
 }
 
 
-.pin-grid::-webkit-scrollbar-track {
+.pinterest-widget-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
 
-.pin-grid::-webkit-scrollbar-thumb {
+.pinterest-widget-scroll::-webkit-scrollbar-thumb {
   background: var(--border);
 
   border-radius: 999px;
 }
 
 
-.pin {
-  display: block;
+.pinterest-widget-inner {
+  width: 100%;
+  min-height: 1200px;
 
   overflow: hidden;
-
-  border-radius: 8px;
-
-  background: var(--surface-soft);
-
-  text-decoration: none;
-
-  grid-row-end: span 28;
 }
 
 
-.pin:nth-child(3n + 1) {
-  grid-row-end: span 44;
-}
+/*
+  Pinterest replaces the anchor with
+  its own generated widget.
 
+  We let Pinterest consume the full
+  width of our panel.
+*/
 
-.pin:nth-child(4n + 2) {
-  grid-row-end: span 30;
-}
-
-
-.pin:nth-child(5n + 3) {
-  grid-row-end: span 36;
-}
-
-
-.pin img {
-  width: 100%;
-  height: 100%;
-
-  display: block;
-
-  object-fit: cover;
-
-  filter:
-    saturate(0.85)
-    brightness(0.88);
-
-  transition:
-    transform 180ms ease,
-    filter 180ms ease;
-}
-
-
-.pin:hover img {
-  transform: scale(1.025);
-
-  filter:
-    saturate(1)
-    brightness(1);
+.pinterest-widget-inner > span,
+.pinterest-widget-inner iframe {
+  max-width: 100% !important;
 }
 
 
@@ -540,7 +513,9 @@ input {
 
   padding: 0;
 
-  border: 2px solid transparent;
+  border:
+    2px solid transparent;
+
   border-radius: 50%;
 
   cursor: pointer;
@@ -562,7 +537,7 @@ input {
 
 
 /* =========================================================
-   THEME BUTTON COLOURS
+   THEME BUTTONS
 ========================================================= */
 
 .theme-button[data-theme="everforest"] {
@@ -693,12 +668,6 @@ body[data-theme="blue"] {
     min-height: 90px;
   }
 
-
-  .pin-grid {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-  }
-
 }
 
 
@@ -718,12 +687,6 @@ body[data-theme="blue"] {
 
   .content {
     min-height: 760px;
-  }
-
-
-  .pin-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
   }
 
 
