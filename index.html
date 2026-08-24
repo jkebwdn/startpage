@@ -14,13 +14,8 @@
 
   <main class="dashboard">
 
-    <!-- =========================================================
-         SIDEBAR
-    ========================================================== -->
-
     <section class="sidebar">
 
-      <!-- Greeting -->
       <article class="panel greeting-panel">
 
         <div class="avatar">
@@ -43,7 +38,6 @@
       </article>
 
 
-      <!-- Media -->
       <article class="panel">
 
         <h2>Media</h2>
@@ -60,7 +54,6 @@
                 <path d="M7 2h5.2L19 12l-6.8 10H7l6.8-10L7 2z"></path>
               </svg>
             </span>
-
             <span>Plex</span>
           </a>
 
@@ -76,7 +69,6 @@
                 <path d="M10 9l5 3-5 3V9z"></path>
               </svg>
             </span>
-
             <span>YouTube</span>
           </a>
 
@@ -93,7 +85,6 @@
                 <path d="M6 3h4v18H6V3z"></path>
               </svg>
             </span>
-
             <span>Netflix</span>
           </a>
 
@@ -110,7 +101,6 @@
                 <path d="M14 15l4-2-1 4"></path>
               </svg>
             </span>
-
             <span>Prime Video</span>
           </a>
 
@@ -127,7 +117,6 @@
                 <path d="M9 12c2 1 4 1 6 0"></path>
               </svg>
             </span>
-
             <span>Disney+</span>
           </a>
 
@@ -136,7 +125,6 @@
       </article>
 
 
-      <!-- Tools -->
       <article class="panel">
 
         <h2>Tools</h2>
@@ -176,7 +164,6 @@
                 ></path>
               </svg>
             </span>
-
             <span>GitHub</span>
           </a>
 
@@ -209,7 +196,6 @@
                 <path d="M12 5.5v8.8"></path>
               </svg>
             </span>
-
             <span>ChatGPT</span>
           </a>
 
@@ -218,7 +204,6 @@
       </article>
 
 
-      <!-- Social -->
       <article class="panel">
 
         <h2>Social</h2>
@@ -236,7 +221,6 @@
                 <path d="M19 4L5 20"></path>
               </svg>
             </span>
-
             <span>X</span>
           </a>
 
@@ -258,7 +242,6 @@
                 <circle cx="19" cy="11" r="1.5"></circle>
               </svg>
             </span>
-
             <span>Reddit</span>
           </a>
 
@@ -269,10 +252,6 @@
     </section>
 
 
-    <!-- =========================================================
-         MAIN CONTENT
-    ========================================================== -->
-
     <section class="content">
 
       <form
@@ -280,7 +259,6 @@
         action="https://www.google.com/search"
         method="get"
       >
-
         <span class="search-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="11" cy="11" r="6"></circle>
@@ -295,40 +273,26 @@
           autocomplete="off"
           aria-label="Search the web"
         />
-
       </form>
 
 
-      <!-- Pinterest -->
       <article class="panel pinterest-panel">
 
         <div class="panel-header">
-
           <h2>Pinterest Inspiration</h2>
-
-          <span
-            id="pinterest-status"
-            class="pinterest-status"
-          >
-            Loading recent pins…
-          </span>
-
         </div>
 
 
-        <div
-          id="pin-grid"
-          class="pin-grid"
-          aria-live="polite"
-        >
+        <div class="pinterest-viewport">
 
-          <div class="pinterest-loading">
+          <div class="pinterest-oversize">
 
-            <span class="loading-spinner"></span>
-
-            <span>
-              Fetching recent pins…
-            </span>
+            <a
+              data-pin-do="embedUser"
+              data-pin-scale-width="150"
+              data-pin-scale-height="1400"
+              href="https://uk.pinterest.com/jkebwdn/"
+            ></a>
 
           </div>
 
@@ -338,10 +302,6 @@
 
     </section>
 
-
-    <!-- =========================================================
-         THEME SELECTOR
-    ========================================================== -->
 
     <section class="panel theme-panel">
 
@@ -385,6 +345,12 @@
 
 
   <script src="script.js"></script>
+
+  <script
+    async
+    defer
+    src="https://assets.pinterest.com/js/pinit.js"
+  ></script>
 
 </body>
 </html>
