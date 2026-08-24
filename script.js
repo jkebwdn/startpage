@@ -8,10 +8,6 @@ const themeButtons =
   document.querySelectorAll(".theme-button");
 
 
-/* =========================================================
-   CLOCK + GREETING
-========================================================= */
-
 function updateClock() {
 
   const now = new Date();
@@ -79,10 +75,6 @@ function updateClock() {
 }
 
 
-/* =========================================================
-   THEMES
-========================================================= */
-
 function setTheme(themeName) {
 
   document.body.dataset.theme =
@@ -114,10 +106,6 @@ function setTheme(themeName) {
 }
 
 
-/* =========================================================
-   THEME BUTTON EVENTS
-========================================================= */
-
 themeButtons.forEach(
   (button) => {
 
@@ -136,10 +124,6 @@ themeButtons.forEach(
 );
 
 
-/* =========================================================
-   RESTORE SAVED THEME
-========================================================= */
-
 const savedTheme =
   localStorage.getItem(
     "startpage-theme"
@@ -156,10 +140,6 @@ if (savedTheme) {
 
 }
 
-
-/* =========================================================
-   START CLOCK
-========================================================= */
 
 updateClock();
 
