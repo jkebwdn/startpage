@@ -23,6 +23,7 @@ const PINTEREST_WORKER_URL =
 ========================================================= */
 
 function updateClock() {
+
   const now =
     new Date();
 
@@ -35,11 +36,15 @@ function updateClock() {
 
 
   if (hour < 12) {
+
     greeting =
       "Good morning, jkebwdn.";
+
   } else if (hour < 18) {
+
     greeting =
       "Good afternoon, jkebwdn.";
+
   }
 
 
@@ -82,6 +87,7 @@ function updateClock() {
 
   dateTimeElement.textContent =
     `${time} • ${weekday} ${date}`;
+
 }
 
 
@@ -90,6 +96,7 @@ function updateClock() {
 ========================================================= */
 
 function setTheme(themeName) {
+
   document.body.dataset.theme =
     themeName;
 
@@ -102,6 +109,7 @@ function setTheme(themeName) {
 
   themeButtons.forEach(
     (button) => {
+
       const isSelected =
         button.dataset.theme ===
         themeName;
@@ -111,21 +119,27 @@ function setTheme(themeName) {
         "selected",
         isSelected
       );
+
     }
   );
+
 }
 
 
 themeButtons.forEach(
   (button) => {
+
     button.addEventListener(
       "click",
       () => {
+
         setTheme(
           button.dataset.theme
         );
+
       }
     );
+
   }
 );
 
@@ -137,98 +151,131 @@ const savedTheme =
 
 
 if (savedTheme) {
-  setTheme(savedTheme);
+
+  /*
+    Compatibility with the old generic blue
+    theme name.
+  */
+
+  if (savedTheme === "blue") {
+
+    setTheme("zen");
+
+  } else {
+
+    setTheme(savedTheme);
+
+  }
+
 } else {
+
   setTheme("everforest");
+
 }
 
 
 /* =========================================================
-   PINTEREST
+   MASONRY HELPERS
 ========================================================= */
 
-async function loadPinterest() {
-  try {
-    pinterestStatus.textContent =
-      "Loading…";
+function getColumnCount() {
+
+  const width =
+    window.innerWidth;
 
 
-    const response =
-      await fetch(
-        PINTEREST_WORKER_URL,
-        {
-          headers: {
-            Accept:
-              "application/json"
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-      throw new Error(
-        `Pinterest feed request failed: ${response.status}`
-      );
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if (!Array.isArray(data.pins)) {
-      throw new Error(
-        "Pinterest feed returned invalid data."
-      );
-    }
-
-
-    renderPins(
-      data.pins
-    );
-
-
-    pinterestStatus.textContent =
-      `${data.count} recent`;
-
-    pinterestStatus.className =
-      "pinterest-status success";
-
-  } catch (error) {
-    console.error(
-      "Pinterest load failed:",
-      error
-    );
-
-
-    pinterestStatus.textContent =
-      "Feed unavailable";
-
-    pinterestStatus.className =
-      "pinterest-status error";
-
-
-    pinGrid.innerHTML =
-      `
-        <div class="pinterest-error">
-          <strong>Pinterest unavailable</strong>
-
-          <p>
-            The recent-pin feed could not be loaded.
-          </p>
-        </div>
-      `;
+  if (width <= 700) {
+    return 2;
   }
+
+
+  if (width <= 1100) {
+    return 3;
+  }
+
+
+  return 4;
+
 }
 
 
-function renderPins(pins) {
+function createMasonryColumns() {
+
   pinGrid.innerHTML =
     "";
 
 
-  pins.forEach(
-    (pin) => {
+  const count =
+    getColumnCount();
+
+
+  const columns =
+    [];
+
+
+  for (
+    let index = 0;
+    index < count;
+    index += 1
+  ) {
+
+    const column =
+      document.createElement("div");
+
+
+    column.className =
+      "masonry-column";
+
+
+    pinGrid.appendChild(
+      column
+    );
+
+
+    columns.push(
+      column
+    );
+
+  }
+
+
+  return columns;
+
+}
+
+
+function getShortestColumn(columns) {
+
+  return columns.reduce(
+    (shortest, column) => {
+
+      if (
+        column.scrollHeight <
+        shortest.scrollHeight
+      ) {
+
+        return column;
+
+      }
+
+
+      return shortest;
+
+    },
+    columns[0]
+  );
+
+}
+
+
+/* =========================================================
+   CREATE PIN
+========================================================= */
+
+function createPinElement(pin) {
+
+  return new Promise(
+    (resolve) => {
 
       const link =
         document.createElement("a");
@@ -251,29 +298,69 @@ function renderPins(pins) {
         document.createElement("img");
 
 
-      image.src =
-        pin.image;
-
       image.alt =
-        pin.title || "Pinterest pin";
-
-      image.loading =
-        "lazy";
+        pin.title ||
+        "Pinterest pin";
 
       image.decoding =
         "async";
 
 
-      image.onerror =
+      /*
+        We intentionally don't use lazy loading here.
+
+        The feed only has ~25 items, and loading them
+        immediately lets us calculate masonry height
+        correctly before placing each item.
+      */
+
+      image.loading =
+        "eager";
+
+
+      let fallbackUsed =
+        false;
+
+
+      image.addEventListener(
+        "error",
         () => {
+
           if (
-            pin.thumbnail &&
-            image.src !== pin.thumbnail
+            !fallbackUsed &&
+            pin.thumbnail
           ) {
+
+            fallbackUsed =
+              true;
+
+
             image.src =
               pin.thumbnail;
+
+
+            return;
+
           }
-        };
+
+
+          resolve(null);
+
+        }
+      );
+
+
+      image.addEventListener(
+        "load",
+        () => {
+
+          resolve(link);
+
+        },
+        {
+          once: true
+        }
+      );
 
 
       link.appendChild(
@@ -282,10 +369,9 @@ function renderPins(pins) {
 
 
       if (pin.title) {
+
         const overlay =
-          document.createElement(
-            "div"
-          );
+          document.createElement("div");
 
 
         overlay.className =
@@ -298,15 +384,180 @@ function renderPins(pins) {
         link.appendChild(
           overlay
         );
+
       }
 
 
-      pinGrid.appendChild(
-        link
-      );
+      image.src =
+        pin.image;
+
     }
   );
+
 }
+
+
+/* =========================================================
+   RENDER MASONRY
+========================================================= */
+
+async function renderPins(pins) {
+
+  const columns =
+    createMasonryColumns();
+
+
+  for (const pin of pins) {
+
+    const element =
+      await createPinElement(
+        pin
+      );
+
+
+    if (!element) {
+      continue;
+    }
+
+
+    const shortestColumn =
+      getShortestColumn(
+        columns
+      );
+
+
+    shortestColumn.appendChild(
+      element
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PINTEREST
+========================================================= */
+
+async function loadPinterest() {
+
+  try {
+
+    pinterestStatus.textContent =
+      "Loading…";
+
+
+    const response =
+      await fetch(
+        PINTEREST_WORKER_URL,
+        {
+          headers: {
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `Pinterest feed request failed: ${response.status}`
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !Array.isArray(
+        data.pins
+      )
+    ) {
+
+      throw new Error(
+        "Pinterest feed returned invalid data."
+      );
+
+    }
+
+
+    await renderPins(
+      data.pins
+    );
+
+
+    pinterestStatus.textContent =
+      `${data.count} recent`;
+
+    pinterestStatus.className =
+      "pinterest-status success";
+
+
+  } catch (error) {
+
+    console.error(
+      "Pinterest load failed:",
+      error
+    );
+
+
+    pinterestStatus.textContent =
+      "Feed unavailable";
+
+    pinterestStatus.className =
+      "pinterest-status error";
+
+
+    pinGrid.innerHTML =
+      `
+        <div class="pinterest-error">
+          <strong>
+            Pinterest unavailable
+          </strong>
+
+          <p>
+            The recent-pin feed could not be loaded.
+          </p>
+        </div>
+      `;
+
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE MASONRY REBUILD
+========================================================= */
+
+let resizeTimer;
+
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    clearTimeout(
+      resizeTimer
+    );
+
+
+    resizeTimer =
+      setTimeout(
+        () => {
+
+          loadPinterest();
+
+        },
+        250
+      );
+
+  }
+);
 
 
 /* =========================================================
