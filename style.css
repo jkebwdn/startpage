@@ -196,7 +196,6 @@ input {
   height: 38px;
 
   fill: none;
-
   stroke: currentColor;
   stroke-width: 1.6;
   stroke-linecap: round;
@@ -224,7 +223,6 @@ input {
   font-weight: 500;
 
   text-transform: uppercase;
-
   white-space: nowrap;
 }
 
@@ -275,7 +273,6 @@ input {
 
 .link-list a:hover {
   color: var(--accent);
-
   transform: translateX(4px);
 }
 
@@ -319,7 +316,6 @@ input {
 
 .icon-fill svg {
   fill: currentColor;
-
   stroke: none;
 }
 
@@ -404,80 +400,222 @@ input {
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
 
   border-bottom: 1px solid var(--border);
 }
 
 
-/*
-  Outer dark viewport.
-  This is the only part of the Pinterest
-  section that participates in our layout.
-*/
+.pinterest-status {
+  color: var(--muted);
 
-.pinterest-viewport {
-  position: relative;
+  font-size: 0.68rem;
 
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+
+.pinterest-status.success {
+  color: var(--accent);
+}
+
+
+.pinterest-status.error {
+  color: var(--accent);
+}
+
+
+/* =========================================================
+   PINTEREST MASONRY
+========================================================= */
+
+.pin-grid {
   min-width: 0;
   min-height: 0;
 
-  width: 100%;
   height: 100%;
 
-  overflow: auto;
+  padding: 12px;
 
-  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-  background: var(--surface);
+  columns: 4;
+  column-gap: 10px;
 
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
 
 
-.pinterest-viewport::-webkit-scrollbar {
+.pin-grid::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
 }
 
 
-.pinterest-viewport::-webkit-scrollbar-track {
+.pin-grid::-webkit-scrollbar-track {
   background: transparent;
 }
 
 
-.pinterest-viewport::-webkit-scrollbar-thumb {
+.pin-grid::-webkit-scrollbar-thumb {
   background: var(--border);
 
   border-radius: 999px;
 }
 
 
-/*
-  Pinterest gets a large canvas so it is
-  encouraged to render multiple columns.
+.pin {
+  position: relative;
 
-  The viewport above clips/scrolls it.
-*/
+  display: inline-block;
 
-.pinterest-oversize {
   width: 100%;
-  min-width: 900px;
-  min-height: 1400px;
+
+  margin: 0 0 10px;
+
+  break-inside: avoid;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  background: var(--surface-soft);
+
+  text-decoration: none;
+
+  vertical-align: top;
 }
 
 
-/*
-  Pinterest generates a span/iframe-like
-  structure after pinit.js runs.
+.pin img {
+  width: 100%;
+  height: auto;
 
-  We can size the outer generated wrapper,
-  but not recolour its internals.
-*/
+  display: block;
 
-.pinterest-oversize > span {
-  width: 100% !important;
-  max-width: none !important;
+  filter:
+    saturate(0.88)
+    brightness(0.9);
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+
+.pin:hover img {
+  transform: scale(1.025);
+
+  filter:
+    saturate(1)
+    brightness(1);
+}
+
+
+.pin-overlay {
+  position: absolute;
+
+  inset:
+    auto 0 0 0;
+
+  padding:
+    28px 10px 9px;
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(0, 0, 0, 0.72)
+    );
+
+  color: #ffffff;
+
+  font-size: 0.66rem;
+  line-height: 1.35;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+    opacity 160ms ease;
+}
+
+
+.pin:hover .pin-overlay {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   PINTEREST LOADING / ERROR
+========================================================= */
+
+.pinterest-loading,
+.pinterest-error {
+  width: 100%;
+
+  min-height: 180px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  color: var(--muted);
+
+  text-align: center;
+
+  font-size: 0.78rem;
+
+  column-span: all;
+}
+
+
+.pinterest-error strong {
+  color: var(--accent);
+
+  font-weight: 500;
+
+  text-transform: uppercase;
+}
+
+
+.pinterest-error p {
+  max-width: 520px;
+
+  margin: 0;
+
+  line-height: 1.6;
+}
+
+
+.loading-spinner {
+  width: 22px;
+  height: 22px;
+
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+
+  border-radius: 50%;
+
+  animation: spin 700ms linear infinite;
+}
+
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 
@@ -663,23 +801,20 @@ body[data-theme="blue"] {
 
   .theme-panel {
     grid-column: 1;
-
     min-height: 90px;
   }
 
 
-  .pinterest-oversize {
-    min-width: 760px;
+  .pin-grid {
+    columns: 3;
   }
-
 }
 
 
 @media (max-width: 700px) {
 
   .dashboard {
-    width:
-      calc(100% - 24px);
+    width: calc(100% - 24px);
 
     padding: 14px 0;
   }
@@ -695,6 +830,11 @@ body[data-theme="blue"] {
   }
 
 
+  .pin-grid {
+    columns: 2;
+  }
+
+
   .theme-panel {
     min-height: 100px;
 
@@ -702,10 +842,4 @@ body[data-theme="blue"] {
 
     gap: 20px;
   }
-
-
-  .pinterest-oversize {
-    min-width: 620px;
-  }
-
 }
