@@ -1,53 +1,93 @@
-const greetingElement = document.getElementById("greeting");
-const dateTimeElement = document.getElementById("date-time");
+const greetingElement =
+  document.getElementById("greeting");
 
-const themeButtons = document.querySelectorAll(".theme-button");
+const dateTimeElement =
+  document.getElementById("date-time");
 
+const themeButtons =
+  document.querySelectorAll(".theme-button");
+
+
+/* =========================================================
+   CLOCK + GREETING
+========================================================= */
 
 function updateClock() {
+
   const now = new Date();
 
   const hour = now.getHours();
 
-  let greeting = "Good evening.";
+
+  let greeting =
+    "Good evening, jkebwdn.";
+
 
   if (hour < 12) {
-    greeting = "Good morning.";
+
+    greeting =
+      "Good morning, jkebwdn.";
+
   } else if (hour < 18) {
-    greeting = "Good afternoon.";
+
+    greeting =
+      "Good afternoon, jkebwdn.";
+
   }
 
-  greetingElement.textContent = greeting;
+
+  greetingElement.textContent =
+    greeting;
 
 
-  const time = now.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
+  const time =
+    now.toLocaleTimeString(
+      "en-GB",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }
+    );
 
 
-  const weekday = now
-    .toLocaleDateString("en-GB", {
-      weekday: "short"
-    })
-    .toUpperCase();
+  const weekday =
+    now
+      .toLocaleDateString(
+        "en-GB",
+        {
+          weekday: "short"
+        }
+      )
+      .toUpperCase();
 
 
-  const date = now.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit"
-  });
+  const date =
+    now.toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit"
+      }
+    );
 
 
   dateTimeElement.textContent =
     `${time} • ${weekday} ${date}`;
+
 }
 
 
+/* =========================================================
+   THEMES
+========================================================= */
+
 function setTheme(themeName) {
-  document.body.dataset.theme = themeName;
+
+  document.body.dataset.theme =
+    themeName;
+
 
   localStorage.setItem(
     "startpage-theme",
@@ -55,37 +95,74 @@ function setTheme(themeName) {
   );
 
 
-  themeButtons.forEach((button) => {
-    const isSelected =
-      button.dataset.theme === themeName;
+  themeButtons.forEach(
+    (button) => {
 
-    button.classList.toggle(
-      "selected",
-      isSelected
-    );
-  });
+      const isSelected =
+        button.dataset.theme ===
+        themeName;
+
+
+      button.classList.toggle(
+        "selected",
+        isSelected
+      );
+
+    }
+  );
+
 }
 
 
-themeButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    setTheme(button.dataset.theme);
-  });
-});
+/* =========================================================
+   THEME BUTTON EVENTS
+========================================================= */
 
+themeButtons.forEach(
+  (button) => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        setTheme(
+          button.dataset.theme
+        );
+
+      }
+    );
+
+  }
+);
+
+
+/* =========================================================
+   RESTORE SAVED THEME
+========================================================= */
 
 const savedTheme =
-  localStorage.getItem("startpage-theme");
+  localStorage.getItem(
+    "startpage-theme"
+  );
 
 
 if (savedTheme) {
+
   setTheme(savedTheme);
+
 } else {
+
   setTheme("everforest");
+
 }
 
 
+/* =========================================================
+   START CLOCK
+========================================================= */
+
 updateClock();
+
 
 setInterval(
   updateClock,
