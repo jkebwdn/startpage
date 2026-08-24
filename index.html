@@ -14,8 +14,13 @@
 
   <main class="dashboard">
 
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
     <section class="sidebar">
 
+      <!-- Greeting -->
       <article class="panel greeting-panel">
 
         <div class="avatar">
@@ -38,6 +43,7 @@
       </article>
 
 
+      <!-- Media -->
       <article class="panel">
 
         <h2>Media</h2>
@@ -130,6 +136,7 @@
       </article>
 
 
+      <!-- Tools -->
       <article class="panel">
 
         <h2>Tools</h2>
@@ -211,6 +218,7 @@
       </article>
 
 
+      <!-- Social -->
       <article class="panel">
 
         <h2>Social</h2>
@@ -261,6 +269,10 @@
     </section>
 
 
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
+
     <section class="content">
 
       <form
@@ -287,23 +299,36 @@
       </form>
 
 
+      <!-- Pinterest -->
       <article class="panel pinterest-panel">
 
         <div class="panel-header">
+
           <h2>Pinterest Inspiration</h2>
+
+          <span
+            id="pinterest-status"
+            class="pinterest-status"
+          >
+            Loading recent pins…
+          </span>
+
         </div>
 
 
-        <div class="pinterest-widget-scroll">
+        <div
+          id="pin-grid"
+          class="pin-grid"
+          aria-live="polite"
+        >
 
-          <div class="pinterest-widget-inner">
+          <div class="pinterest-loading">
 
-            <a
-              data-pin-do="embedUser"
-              data-pin-scale-height="1200"
-              data-pin-scale-width="160"
-              href="https://uk.pinterest.com/jkebwdn/"
-            ></a>
+            <span class="loading-spinner"></span>
+
+            <span>
+              Fetching recent pins…
+            </span>
 
           </div>
 
@@ -313,6 +338,10 @@
 
     </section>
 
+
+    <!-- =========================================================
+         THEME SELECTOR
+    ========================================================== -->
 
     <section class="panel theme-panel">
 
@@ -356,12 +385,6 @@
 
 
   <script src="script.js"></script>
-
-  <script
-    async
-    defer
-    src="https://assets.pinterest.com/js/pinit.js"
-  ></script>
 
 </body>
 </html>
