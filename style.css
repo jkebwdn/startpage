@@ -14,6 +14,10 @@
 }
 
 
+/* =========================================================
+   RESET
+========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -22,8 +26,10 @@
 html,
 body {
   margin: 0;
+
   width: 100%;
   height: 100%;
+
   overflow: hidden;
 }
 
@@ -59,6 +65,10 @@ input {
 }
 
 
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
 .dashboard {
   width: min(1600px, calc(100% - 40px));
   height: 100vh;
@@ -80,6 +90,10 @@ input {
 }
 
 
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
 .sidebar {
   min-height: 0;
 
@@ -92,6 +106,10 @@ input {
   gap: var(--gap);
 }
 
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
 
 .content {
   min-width: 0;
@@ -106,6 +124,10 @@ input {
   gap: var(--gap);
 }
 
+
+/* =========================================================
+   PANELS
+========================================================= */
 
 .panel,
 .search-bar {
@@ -136,6 +158,7 @@ input {
 
   font-size: 0.82rem;
   font-weight: 500;
+
   letter-spacing: 0.07em;
 
   text-transform: uppercase;
@@ -146,6 +169,10 @@ input {
   padding: 16px 20px;
 }
 
+
+/* =========================================================
+   GREETING
+========================================================= */
 
 .greeting-panel {
   display: flex;
@@ -159,7 +186,7 @@ input {
   width: 64px;
   height: 64px;
 
-  flex: 0 0 auto;
+  flex: 0 0 64px;
 
   border: 2px solid var(--accent);
   border-radius: 50%;
@@ -168,14 +195,19 @@ input {
   place-items: center;
 
   color: var(--accent);
-
-  font-size: 2.3rem;
-  line-height: 1;
 }
 
 
-.avatar span {
-  transform: translateY(-2px);
+.avatar svg {
+  width: 38px;
+  height: 38px;
+
+  fill: none;
+
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 
@@ -189,10 +221,17 @@ input {
 
   color: var(--secondary);
 
-  font-size: clamp(0.95rem, 1.1vw, 1.2rem);
+  font-size: clamp(
+    0.78rem,
+    0.85vw,
+    1rem
+  );
+
   font-weight: 500;
 
   text-transform: uppercase;
+
+  white-space: nowrap;
 }
 
 
@@ -202,14 +241,21 @@ input {
   color: var(--accent);
 
   font-size: 0.76rem;
+
+  white-space: nowrap;
 }
 
+
+/* =========================================================
+   LINK LISTS
+========================================================= */
 
 .link-list {
   margin-top: 18px;
 
   display: grid;
-  gap: 14px;
+
+  gap: 16px;
 }
 
 
@@ -219,13 +265,13 @@ input {
   display: flex;
   align-items: center;
 
-  gap: 12px;
-
-  text-decoration: none;
+  gap: 13px;
 
   color: var(--secondary);
 
   font-size: 0.92rem;
+
+  text-decoration: none;
 
   transition:
     color 150ms ease,
@@ -235,21 +281,58 @@ input {
 
 .link-list a:hover {
   color: var(--accent);
+
   transform: translateX(4px);
 }
 
 
+/* =========================================================
+   ICONS
+========================================================= */
+
 .icon {
   width: 22px;
+  height: 22px;
+
+  flex: 0 0 22px;
 
   display: inline-grid;
   place-items: center;
 
   color: var(--accent);
-
-  font-size: 1.15rem;
 }
 
+
+.brand-icon svg {
+  width: 20px;
+  height: 20px;
+
+  fill: none;
+
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+
+.brand-icon svg path,
+.brand-icon svg rect,
+.brand-icon svg circle {
+  vector-effect: non-scaling-stroke;
+}
+
+
+.icon-fill svg {
+  fill: currentColor;
+
+  stroke: none;
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
 
 .search-bar {
   padding: 0 20px;
@@ -262,10 +345,28 @@ input {
 
 
 .search-icon {
-  color: var(--muted);
+  width: 22px;
+  height: 22px;
 
-  font-size: 1.7rem;
-  line-height: 1;
+  flex: 0 0 22px;
+
+  display: grid;
+  place-items: center;
+
+  color: var(--muted);
+}
+
+
+.search-icon svg {
+  width: 19px;
+  height: 19px;
+
+  fill: none;
+
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 
@@ -288,6 +389,10 @@ input {
 }
 
 
+/* =========================================================
+   PINTEREST PANEL
+========================================================= */
+
 .pinterest-panel {
   min-width: 0;
   min-height: 0;
@@ -305,26 +410,14 @@ input {
 
   display: flex;
   align-items: center;
-  justify-content: space-between;
 
   border-bottom: 1px solid var(--border);
 }
 
 
-.panel-dots {
-  display: flex;
-  gap: 9px;
-}
-
-
-.panel-dots span {
-  width: 9px;
-  height: 9px;
-
-  border: 1px solid var(--accent);
-  border-radius: 50%;
-}
-
+/* =========================================================
+   PINTEREST MASONRY GRID
+========================================================= */
 
 .pin-grid {
   min-width: 0;
@@ -340,6 +433,23 @@ input {
 
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+}
+
+
+.pin-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+
+.pin-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.pin-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+
+  border-radius: 999px;
 }
 
 
@@ -383,6 +493,10 @@ input {
     brightness(1);
 }
 
+
+/* =========================================================
+   THEME SELECTOR
+========================================================= */
 
 .theme-panel {
   grid-column: 1 / -1;
@@ -432,6 +546,10 @@ input {
 }
 
 
+/* =========================================================
+   THEME BUTTON COLOURS
+========================================================= */
+
 .theme-button[data-theme="everforest"] {
   background: #a7c080;
 }
@@ -452,6 +570,10 @@ input {
 }
 
 
+/* =========================================================
+   CATPPUCCIN
+========================================================= */
+
 body[data-theme="catppuccin"] {
   --background: #11111b;
   --surface: #181825;
@@ -464,6 +586,10 @@ body[data-theme="catppuccin"] {
   --secondary: #f9e2af;
 }
 
+
+/* =========================================================
+   BLUE
+========================================================= */
 
 body[data-theme="blue"] {
   --background: #16161e;
@@ -478,6 +604,10 @@ body[data-theme="blue"] {
 }
 
 
+/* =========================================================
+   WARM
+========================================================= */
+
 body[data-theme="warm"] {
   --background: #181616;
   --surface: #221f1f;
@@ -491,18 +621,27 @@ body[data-theme="warm"] {
 }
 
 
+/* =========================================================
+   TABLET
+========================================================= */
+
 @media (max-width: 1100px) {
 
   html,
   body {
     height: auto;
     min-height: 100%;
+
     overflow: auto;
   }
 
 
   .dashboard {
-    width: min(900px, calc(100% - 32px));
+    width: min(
+      900px,
+      calc(100% - 32px)
+    );
+
     height: auto;
     min-height: 100vh;
 
@@ -512,7 +651,9 @@ body[data-theme="warm"] {
 
 
   .sidebar {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
+
     grid-template-rows: auto;
   }
 
@@ -524,6 +665,7 @@ body[data-theme="warm"] {
 
   .theme-panel {
     grid-column: 1;
+
     min-height: 90px;
   }
 
@@ -534,6 +676,10 @@ body[data-theme="warm"] {
 
 }
 
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 700px) {
 
