@@ -152,11 +152,6 @@ const savedTheme =
 
 if (savedTheme) {
 
-  /*
-    Compatibility with the old generic blue
-    theme name.
-  */
-
   if (savedTheme === "blue") {
 
     setTheme("zen");
@@ -304,15 +299,6 @@ function createPinElement(pin) {
 
       image.decoding =
         "async";
-
-
-      /*
-        We intentionally don't use lazy loading here.
-
-        The feed only has ~25 items, and loading them
-        immediately lets us calculate masonry height
-        correctly before placing each item.
-      */
 
       image.loading =
         "eager";
