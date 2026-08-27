@@ -4,7 +4,7 @@ A custom browser start page built with vanilla HTML, CSS and JavaScript.
 
 Designed to match my desktop themes across Windows, Linux and macOS, with quick links, theme switching and a live Pinterest inspiration feed.
 
-![Startpage](screenshots/startpage-komorebi.png)
+![Startpage](Screenshots/startpage-komorebi.png)
 
 ## Features
 
@@ -44,15 +44,15 @@ This keeps the feed live while allowing the Pinterest content to inherit the vis
 
 ### BlackMetalKhold / Komorebi
 
-![Komorebi](screenshots/startpage-komorebi.png)
+![Komorebi](Screenshots/startpage-komorebi.png)
 
 ### Everforest
 
-![Everforest](screenshots/startpage-everforest.png)
+![Everforest](Screenshots/startpage-everforest.png)
 
 ### Arch / Zen
 
-![Arch Zen](screenshots/startpage-zen.png)
+![Arch Zen](Screenshots/startpage-zen.png)
 
 ## Files
 
