@@ -1,0 +1,57 @@
+name: Refresh Pinterest feed
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pinterest-feed
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.repository == 'jkebwdn/startpage' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Test parser and client
+        run: |
+          python3 -m unittest discover -s tests -p 'test_*.py'
+          node --test tests/pinterest.test.cjs
+      - name: Verify existing Pages publishing source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pages" --jq '{build_type, source}' > /tmp/pages-source.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/pages-source.json') as handle:
+              pages = json.load(handle)
+          assert pages['build_type'] == 'legacy', 'Expected branch-based Pages publishing'
+          assert pages['source'] == {'branch': 'main', 'path': '/'}, 'Unexpected Pages source'
+          PY
+      - name: Refresh once (failure retains the committed feed)
+        run: python3 scripts/update_pinterest.py
+      - name: Commit only the validated feed
+        run: |
+          if ! git diff --quiet -- feed/pinterest.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -- feed/pinterest.json
+            git commit -m 'chore: refresh Pinterest feed'
+            git push origin HEAD:main
+          fi
+      # GITHUB_TOKEN commits do not themselves trigger a branch-based Pages build.
+      - name: Request Pages build from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent

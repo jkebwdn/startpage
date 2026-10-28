@@ -14,8 +14,16 @@ const pinterestStatus =
   document.getElementById("pinterest-status");
 
 
-const PINTEREST_WORKER_URL =
-  "https://startpage-pinterest.jkebwdn.workers.dev/pins";
+const PINTEREST_FEED_URL = "./feed/pinterest.json";
+const PINTEREST_CACHE_KEY = "startpage-pinterest-v1";
+
+// Storage can be unavailable in private/restricted browser contexts.
+function readStorage(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function writeStorage(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* Optional cache only. */ }
+}
 
 
 /* =========================================================
@@ -101,7 +109,7 @@ function setTheme(themeName) {
     themeName;
 
 
-  localStorage.setItem(
+  writeStorage(
     "startpage-theme",
     themeName
   );
@@ -145,7 +153,7 @@ themeButtons.forEach(
 
 
 const savedTheme =
-  localStorage.getItem(
+  readStorage(
     "startpage-theme"
   );
 
@@ -268,282 +276,167 @@ function getShortestColumn(columns) {
 ========================================================= */
 
 function createPinElement(pin) {
+  return new Promise((resolve) => {
+    const link = document.createElement("a");
+    link.className = "pin";
+    link.href = pin.link;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
 
-  return new Promise(
-    (resolve) => {
-
-      const link =
-        document.createElement("a");
-
-
-      link.className =
-        "pin";
-
-      link.href =
-        pin.link;
-
-      link.target =
-        "_blank";
-
-      link.rel =
-        "noopener noreferrer";
-
-
-      const image =
-        document.createElement("img");
-
-
-      image.alt =
-        pin.title ||
-        "Pinterest pin";
-
-      image.decoding =
-        "async";
-
-      image.loading =
-        "eager";
-
-
-      let fallbackUsed =
-        false;
-
-
-      image.addEventListener(
-        "error",
-        () => {
-
-          if (
-            !fallbackUsed &&
-            pin.thumbnail
-          ) {
-
-            fallbackUsed =
-              true;
-
-
-            image.src =
-              pin.thumbnail;
-
-
-            return;
-
-          }
-
-
-          resolve(null);
-
-        }
-      );
-
-
-      image.addEventListener(
-        "load",
-        () => {
-
-          resolve(link);
-
-        },
-        {
-          once: true
-        }
-      );
-
-
-      link.appendChild(
-        image
-      );
-
-
-      if (pin.title) {
-
-        const overlay =
-          document.createElement("div");
-
-
-        overlay.className =
-          "pin-overlay";
-
-        overlay.textContent =
-          pin.title;
-
-
-        link.appendChild(
-          overlay
-        );
-
+    const image = document.createElement("img");
+    image.alt = pin.title || "Pinterest pin";
+    image.decoding = "async";
+    image.loading = "eager";
+    let fallbackUsed = false;
+    let finished = false;
+    const finish = (result) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      resolve(result);
+    };
+    // A stalled image must not stall the whole feed indefinitely.
+    const timer = setTimeout(() => finish(null), 10000);
+    image.addEventListener("error", () => {
+      if (finished) return;
+      if (!fallbackUsed && pin.thumbnail && pin.thumbnail !== image.src) {
+        fallbackUsed = true;
+        image.src = pin.thumbnail;
+      } else {
+        finish(null);
       }
-
-
-      image.src =
-        pin.image;
-
+    });
+    image.addEventListener("load", () => finish(link), { once: true });
+    link.appendChild(image);
+    if (pin.title) {
+      const overlay = document.createElement("div");
+      overlay.className = "pin-overlay";
+      overlay.textContent = pin.title;
+      link.appendChild(overlay);
     }
-  );
-
+    image.src = pin.image;
+  });
 }
 
-
 /* =========================================================
-   RENDER MASONRY
+   VALIDATED FEED / LAST-KNOWN-GOOD CACHE
 ========================================================= */
+
+function safePinUrl(value, image = false) {
+  if (typeof value !== "string") return "";
+  try {
+    const url = new URL(value);
+    const hostAllowed = image ? url.hostname === "i.pinimg.com" :
+      (url.hostname === "pinterest.com" || url.hostname.endsWith(".pinterest.com"));
+    if (url.protocol !== "https:" || !hostAllowed || url.username || url.password || url.port ||
+        (!image && !/^\/pin\/\d+\/?$/.test(url.pathname))) return "";
+    return url.href;
+  } catch { return ""; }
+}
+
+function validateFeed(data) {
+  if (!data || data.version !== 1 || !Array.isArray(data.pins)) throw new Error("Invalid feed");
+  const updated = Date.parse(data.updatedAt);
+  if (!Number.isFinite(updated) || updated > Date.now() + 300000) throw new Error("Invalid feed date");
+  const seen = new Set();
+  const pins = [];
+  for (const pin of data.pins) {
+    if (!pin || typeof pin !== "object") continue;
+    const link = safePinUrl(pin.link);
+    const image = safePinUrl(pin.image, true);
+    if (!link || !image || seen.has(link)) continue;
+    seen.add(link);
+    pins.push({ link, image, thumbnail: safePinUrl(pin.thumbnail, true),
+      title: typeof pin.title === "string" ? pin.title.slice(0, 300) : "" });
+    if (pins.length === 40) break;
+  }
+  if (!pins.length) throw new Error("No usable Pins");
+  return { version: 1, updatedAt: new Date(updated).toISOString(), pins };
+}
+
+let displayedCards = [];
+function layoutPins() {
+  const columns = createMasonryColumns();
+  for (const card of displayedCards) getShortestColumn(columns).appendChild(card);
+}
 
 async function renderPins(pins) {
-
-  const columns =
-    createMasonryColumns();
-
-
-  for (const pin of pins) {
-
-    const element =
-      await createPinElement(
-        pin
-      );
-
-
-    if (!element) {
-      continue;
-    }
-
-
-    const shortestColumn =
-      getShortestColumn(
-        columns
-      );
-
-
-    shortestColumn.appendChild(
-      element
-    );
-
-  }
-
+  const results = await Promise.all(pins.map(async (pin) => ({ pin, card: await createPinElement(pin) })));
+  const usable = results.filter((result) => result.card);
+  // Do not clear existing cards when replacement images all fail.
+  if (!usable.length) throw new Error("Pin images unavailable");
+  displayedCards = usable.map((result) => result.card);
+  layoutPins();
+  return usable.map((result) => result.pin);
 }
 
+function setPinterestStatus(text, success = false) {
+  pinterestStatus.textContent = text;
+  pinterestStatus.className = `pinterest-status${success ? " success" : ""}`;
+}
 
-/* =========================================================
-   PINTEREST
-========================================================= */
+function showFeedUnavailable() {
+  if (displayedCards.length) {
+    setPinterestStatus("Cached pins");
+    pinterestStatus.title = "Feed temporarily unavailable. Showing previously loaded Pins.";
+    return;
+  }
+  setPinterestStatus("Feed unavailable");
+  const error = document.createElement("div");
+  error.className = "pinterest-error";
+  const title = document.createElement("strong");
+  title.textContent = "Pinterest unavailable";
+  const message = document.createElement("p");
+  message.textContent = "The recent-pin feed could not be loaded.";
+  error.appendChild(title);
+  error.appendChild(message);
+  pinGrid.replaceChildren(error);
+}
 
 async function loadPinterest() {
-
-  try {
-
-    pinterestStatus.textContent =
-      "Loading…";
-
-
-    const response =
-      await fetch(
-        PINTEREST_WORKER_URL,
-        {
-          headers: {
-            Accept:
-              "application/json"
-          }
-        }
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        `Pinterest feed request failed: ${response.status}`
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if (
-      !Array.isArray(
-        data.pins
-      )
-    ) {
-
-      throw new Error(
-        "Pinterest feed returned invalid data."
-      );
-
-    }
-
-
-    await renderPins(
-      data.pins
-    );
-
-
-    pinterestStatus.textContent =
-      `${data.count} recent`;
-
-    pinterestStatus.className =
-      "pinterest-status success";
-
-
-  } catch (error) {
-
-    console.error(
-      "Pinterest load failed:",
-      error
-    );
-
-
-    pinterestStatus.textContent =
-      "Feed unavailable";
-
-    pinterestStatus.className =
-      "pinterest-status error";
-
-
-    pinGrid.innerHTML =
-      `
-        <div class="pinterest-error">
-          <strong>
-            Pinterest unavailable
-          </strong>
-
-          <p>
-            The recent-pin feed could not be loaded.
-          </p>
-        </div>
-      `;
-
+  let cached;
+  try { cached = validateFeed(JSON.parse(readStorage(PINTEREST_CACHE_KEY))); } catch { /* No valid cache. */ }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  // Attach rejection handling immediately while cached images load.
+  const fresh = fetch(PINTEREST_FEED_URL, {
+    headers: { Accept: "application/json" }, cache: "no-cache", signal: controller.signal
+  }).then(async (response) => {
+    if (!response.ok) throw new Error(`Feed HTTP ${response.status}`);
+    return validateFeed(await response.json());
+  }).then((data) => ({ data }), (error) => ({ error })).finally(() => clearTimeout(timeout));
+  if (cached) {
+    try {
+      await renderPins(cached.pins);
+      setPinterestStatus("Cached pins");
+    } catch { /* Network refresh may still succeed. */ }
   }
-
+  try {
+    const result = await fresh;
+    if (result.error) throw result.error;
+    const data = result.data;
+    const pins = await renderPins(data.pins);
+    writeStorage(PINTEREST_CACHE_KEY, JSON.stringify({ ...data, pins }));
+    const stale = Date.now() - Date.parse(data.updatedAt) > 24 * 60 * 60 * 1000;
+    setPinterestStatus(stale ? "Cached pins" : `${pins.length} recent`, !stale);
+    pinterestStatus.title = `${stale ? "Feed temporarily unavailable. " : ""}Last refreshed ${new Date(data.updatedAt).toLocaleString()}`;
+  } catch (error) {
+    console.warn("Pinterest refresh unavailable:", error.message);
+    showFeedUnavailable();
+  }
 }
 
-
 /* =========================================================
-   RESPONSIVE MASONRY REBUILD
+   RESPONSIVE MASONRY REBUILD — no upstream request on resize
 ========================================================= */
 
 let resizeTimer;
-
-
-window.addEventListener(
-  "resize",
-  () => {
-
-    clearTimeout(
-      resizeTimer
-    );
-
-
-    resizeTimer =
-      setTimeout(
-        () => {
-
-          loadPinterest();
-
-        },
-        250
-      );
-
-  }
-);
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (displayedCards.length) layoutPins();
+  }, 250);
+});
 
 
 /* =========================================================
